@@ -102,9 +102,6 @@ function PostForm(){
         ))}
       </div>
     </div>
-
-
-
   );
 }
 
