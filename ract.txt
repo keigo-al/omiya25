@@ -1,0 +1,10 @@
+npm start　アプリ動かす
+
+ Ctrl + Shift + I（Windows）  コンソールログ
+
+
+git switch -c my-canvas-form
+# ファイルを編集・保存
+git add .
+git commit -m "Create MyCanvasForm component"
+git push -u origin my-canvas-form

@@ -1,5 +1,5 @@
 export const sendPostToServer = async(postData) => {//外から使えるようにexport，asyncは非同期処理
-  const response = await fetch("https://example.com/api/posts",{//await　サーバからの返事を待つ
+  const response = await fetch("http://localhost:3001/api/posts",{//await　サーバからの返事を待つ
     method: "POST",
     headers: {
       "Content-Type":"application/json",
