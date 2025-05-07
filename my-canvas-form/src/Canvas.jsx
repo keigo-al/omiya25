@@ -1,6 +1,6 @@
 import React, {useRef, useEffect} from 'react';
 
-const Canvas = ({drawings}) =>{
+const Canvas = ({posts}) =>{
   const canvasRef = useRef(null);
 
   useEffect(()=>{
@@ -10,24 +10,19 @@ const Canvas = ({drawings}) =>{
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    drawings.forEach(d =>{
-      if(d.type === 'line' && Array.isArray(d.log)){
-        ctx.beginPath();
-        const log = d.log;
-        
-        for(let i = 0; i < log.length;i++){
-          const point = log[i];
-          if(i === 0){
-            ctx.moveTo(point.x,point.y);
-          }else{
-            ctx.lineTo(point.x,point.y);
-          }
-        }
+    posts.forEach(post =>{
+      const log = post.log;
+      if(!log || log.length < 2)return;
 
-        ctx.strokeStyle = d.color || 'black';
-        ctx.lineWidth = d.width || 2;
-        ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(log[0].x,log[0].y);
+      for(let i = 1; i < log.length; i++){
+        ctx.lineTo(log[i].x,log[i].y);
       }
+
+      ctx.strokeStyle = d.color || 'black';
+      ctx.lineWidth = d.width || 2;
+      ctx.stroke();
     });
   },[drawings]);
   
