@@ -11,6 +11,7 @@ app.post("/api/posts",(req,res)=>{
   console.log(req.body);
   res.status(200).json({
     message: "success",
+    type:"line",
     received: req.body,
     id: Date.now(),
   });

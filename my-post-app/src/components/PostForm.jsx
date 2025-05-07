@@ -43,7 +43,7 @@ function PostForm(){
     const newPost = {
       id: Date.now(),
       text,
-        image: imageData,
+        //image: imageData,
         log: drawingLog,
       };
 
