@@ -14,12 +14,12 @@ function PostForm(){
   //ここよくわからん，後からよく理解する
   const setup = (p5, canvasParentRef) =>{
     p5.createCanvas(400,300).parent(canvasParentRef);
-    p5.background(255);
+    p5.background(173, 216, 230);
     window.p5Instance = p5;
   };
 
   const draw = (p5) => {
-    if (p5.mouseIsPressed && p5.mouseY < 300){// マウス押す&&範囲内
+    if (p5.mouseIsPressed && p5.mouseY < 300&& p5.mouseX < 400 && p5.mouseX >= 0){// マウス押す&&範囲内
       if (!isDrawing) isDrawing = true;
       p5.stroke(color);//色
       p5.strokeWeight(2);//太さ
@@ -33,6 +33,38 @@ function PostForm(){
       isDrawing = false;
     }
   };
+
+  //実際のサーバ用
+  const createSketch = async() => {
+    const res = await fetch("http://localhost:5000/api/create_sketch", {
+      method: "POST",
+    });
+    const data = await res.json();
+    return data.Sketch_id;
+  }
+
+  const convertLogToLines = (log ) =>{
+    const lines = [];
+    for(let i = 1; i < log.length; i++){
+      lines.push(
+        {
+          start_x:log[i-1].x,
+          start_y:log[i-1].y,
+          end_x:log[i].x,
+          end_y:log[i].y,
+        }
+      );
+    }
+    return lines;
+  }
+
+  const saveLines = async (sketch_id, lines) => {
+    await fetch("http://localhost:5000/api/save_lines",{
+      method: "POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({sketch_id,lines}),
+    })
+  }
 
 
   const handleSubmit = async(e) => {
@@ -50,13 +82,16 @@ function PostForm(){
     };
 
     try{
-      const response = await sendPostToServer(newPost);
-      console.log("サーバの返答：",response);
-      setPosts([response,...posts]);
-    }catch(error){
-      console.error("送信エラー：",error)
-    }
+      const sketch_id = await createSketch();
 
+      const lines = convertLogToLines(drawingLog);
+      console.log(lines);
+
+      await saveLines(sketch_id,lines);
+
+    }catch(error){
+      console.error("送信エラー:",error);
+    }
 
     setText("");
     setDrawingLog([]);
@@ -70,7 +105,7 @@ function PostForm(){
 
 
   return (
-    <div className = "p-4 max-w-md mx-auto">
+    <div className = "p-4 max-w-md mx-auto bg-gray-200">
       <form onSubmit={handleSubmit} className="space-y-2">
      {/*テキスト入力欄*/}
        {  /* 
