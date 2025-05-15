@@ -8,3 +8,9 @@ git switch -c my-canvas-form
 git add .
 git commit -m "Create MyCanvasForm component"
 git push -u origin my-canvas-form
+
+
+canvasform npm start 
+
+node failname.js
+

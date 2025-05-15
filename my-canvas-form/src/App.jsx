@@ -5,7 +5,7 @@ const App = () => {
   const[posts, setPosts] = useState([]);
 
   useEffect(()=>{
-    fetch('http://localhost:3001/api/drawings')
+    fetch('http://localhost:3001/api/posts')
       .then(res => res.json())
       .then(data => setPosts(data))
       .catch(err => console.error("Error fetching drawings:",err));

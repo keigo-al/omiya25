@@ -20,11 +20,11 @@ const Canvas = ({posts}) =>{
         ctx.lineTo(log[i].x,log[i].y);
       }
 
-      ctx.strokeStyle = d.color || 'black';
-      ctx.lineWidth = d.width || 2;
+      ctx.strokeStyle = post.color || 'black';
+      ctx.lineWidth = post.width || 2;
       ctx.stroke();
     });
-  },[drawings]);
+  },[posts]);
   
   return(
     <canvas

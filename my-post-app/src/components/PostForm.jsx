@@ -6,6 +6,7 @@ function PostForm(){
   const [text,setText]             = useState(""); //userのコメントの管理
   const [posts, setPosts]          = useState([]); //投稿された内容の配列
   const [drawingLog,setDrawingLog] = useState([]); //書いた線を点として記録，すべて点として記録されている，線で別れてない
+  const [color,setColor] = useState("#000000");
 
   let isDrawing = false; //書いているのかどうかの判断
 
@@ -20,7 +21,7 @@ function PostForm(){
   const draw = (p5) => {
     if (p5.mouseIsPressed && p5.mouseY < 300){// マウス押す&&範囲内
       if (!isDrawing) isDrawing = true;
-      p5.stroke(0);//色
+      p5.stroke(color);//色
       p5.strokeWeight(2);//太さ
       p5.line(p5.pmouseX,p5.pmouseY,p5.mouseX,p5.mouseY);//pmouse:ひとつ前の位置，mouse:今の位置
 
@@ -43,9 +44,10 @@ function PostForm(){
     const newPost = {
       id: Date.now(),
       text,
-        //image: imageData,
-        log: drawingLog,
-      };
+      image: imageData,
+      log: drawingLog,
+      color,
+    };
 
     try{
       const response = await sendPostToServer(newPost);
@@ -70,14 +72,32 @@ function PostForm(){
   return (
     <div className = "p-4 max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="space-y-2">
-        {/*テキスト入力欄*/}
+     {/*テキスト入力欄*/}
+       {  /* 
         <textarea
           className="w-full p-2 border rounded"
           placeholder="write something"
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-
+      */}
+      {/*色選択ツール*/ }
+      <div className = "flex gap-2 mb-2">
+        {
+          ["#000000","#ff0000","#0000ff","#00cc00"].map((c) => (
+            <button
+              key = {c}
+              onClick={() => setColor(c)}
+              className="w-6 h-6 rounded-full border-2"
+              style={{backgroundColor:c}}
+              />
+          ))
+        }
+      </div>
+      <label className = "block">
+        線の色:
+        <input type = "color" value = {color} onChange = {(e) => setColor(e.target.value)}/>
+      </label>
         {/*お絵描きキャンバス*/ }
         <Sketch setup={setup} draw = {draw}/>
 
@@ -92,7 +112,8 @@ function PostForm(){
       </form>
 
 
-      {/*投稿一覧*/}
+      {/*投稿一覧
+      /*
       <div className="mt-6 space-y-2">
         {posts.map((post)=>(
           <div key = {post.id} className="p-3 border rounded bg-gray-50">
@@ -101,6 +122,7 @@ function PostForm(){
           </div>
         ))}
       </div>
+      */}
     </div>
   );
 }
