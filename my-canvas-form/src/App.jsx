@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Canvas from './Canvas';
 
 const App = () => {
-  const [lines, setLines] = useState([]);
-  const [triggerUpdate, setTriggerUpdate] = useState(0); // 更新トリガー用
+  const [sketches, setSketches] = useState([]);
+  const [triggerUpdate, setTriggerUpdate] = useState(0);
 
   useEffect(() => {
     let timeoutId;
@@ -12,16 +12,36 @@ const App = () => {
       fetch('http://localhost:5000/api/get_all_sketch_lines')
         .then(res => res.json())
         .then(data => {
-          setLines(data);
+          // ① sketch_id ごとにグループ化
+          const grouped = {};
+          data.forEach(line => {
+            const id = line.sketch_id;
+            if (!grouped[id]) grouped[id] = [];
+            grouped[id].push(line);
+          });
 
-          // 描画時間 + 余白（例えば2秒後）に次回実行を予約
+          // ② sketch_id 降順で並べて、上位30件取り出す
+          const sortedIds = Object.keys(grouped)
+            .map(Number)
+            .sort((a, b) => b - a)
+            .slice(0, 30);
+
+          // ③ sketch データ構造に整形
+          const sketchList = sortedIds.map((id, index) => ({
+            sketch_id: id,
+            lines: grouped[id],
+            animate: index < 10 // 最新10件だけアニメーション
+          }));
+
+          setSketches(sketchList);
+
+          // 次の更新を予約
           timeoutId = setTimeout(() => {
-            setTriggerUpdate(prev => prev + 1); // 次の fetch トリガー
-          }, 5000); // 5秒待って次の取得
+            setTriggerUpdate(prev => prev + 1);
+          }, 5000);
         })
         .catch(err => {
           console.error("取得失敗:", err);
-          // エラー時も少し待ってリトライ
           timeoutId = setTimeout(() => {
             setTriggerUpdate(prev => prev + 1);
           }, 5000);
@@ -29,15 +49,13 @@ const App = () => {
     };
 
     fetchLines();
-
-    // クリーンアップ（画面が切り替わった時など）
     return () => clearTimeout(timeoutId);
-  }, [triggerUpdate]); // ← ここがポイント：描画完了→次の fetch を制御
+  }, [triggerUpdate]);
 
   return (
     <div>
       <h1>再生付きスケッチ（間隔制御）</h1>
-      <Canvas lines={lines} />
+      <Canvas sketches={sketches} />
     </div>
   );
 };

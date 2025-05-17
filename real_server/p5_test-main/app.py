@@ -6,6 +6,8 @@ app = Flask(__name__)
 CORS(app)
 DATABASE = 'lines.db'
 
+
+
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
@@ -83,10 +85,14 @@ def save_lines():
                 conn.rollback()
                 close_db(conn)
                 return jsonify({'error': 'Invalid line data found in the list.'}), 400
+            color = line.get('color', '#000000')         # デフォルト黒
+            thickness = line.get('thickness', 2.0)       # デフォルト太さ1.0
+
             cursor.execute(
-                "INSERT INTO lines (sketch_id, start_x, start_y, end_x, end_y) VALUES (?, ?, ?, ?, ?)",
-                (sketch_id, line['start_x'], line['start_y'], line['end_x'], line['end_y'])
+                "INSERT INTO lines (sketch_id, start_x, start_y, end_x, end_y, color, thickness) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (sketch_id, line['start_x'], line['start_y'], line['end_x'], line['end_y'], color, thickness)
             )
+
         conn.commit()
         close_db(conn)
         return jsonify({'message': f'{len(lines_data)} lines saved successfully for sketch {sketch_id}'}), 201
@@ -122,7 +128,7 @@ def get_sketch_lines(sketch_id):
             close_db(conn)
             return jsonify({'error': f'Sketch with id {sketch_id} not found.'}), 404
 
-        cursor.execute("SELECT start_x, start_y, end_x, end_y FROM lines WHERE sketch_id = ?", (sketch_id,))
+        cursor.execute("SELECT start_x, start_y, end_x, end_y,color,thickness FROM lines WHERE sketch_id = ?", (sketch_id,))
         lines = cursor.fetchall()
         close_db(conn)
         return jsonify([dict(row) for row in lines])
@@ -140,6 +146,7 @@ def get_all_sketch_lines():
         cursor.execute("""
             SELECT 
                 l.start_x, l.start_y, l.end_x, l.end_y, 
+                l.color,l.thickness,
                 s.created_at, s.id as sketch_id,
                 FIRST_VALUE(l.start_x) OVER (PARTITION BY s.id ORDER BY l.id ASC) as sketch_start_x,
                 FIRST_VALUE(l.start_y) OVER (PARTITION BY s.id ORDER BY l.id ASC) as sketch_start_y,
@@ -164,4 +171,5 @@ def get_all_sketch_lines():
 if __name__ == '__main__':
     # staticフォルダの場所を明示的に指定 (通常は自動で認識されますが、念のため)
     # app.static_folder = 'static'
-    app.run(debug=True)
+    #init_db()
+    app.run(host='0.0.0.0', port=5000, debug=True)

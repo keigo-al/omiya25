@@ -7,7 +7,7 @@ function PostForm() {
   const [posts, setPosts] = useState([]);
   const [drawingLog, setDrawingLog] = useState([]);
   const [color, setColor] = useState("#000000");
-  const [lineWidth,setLineWidth] = useState(2);
+  const [thickness,setThickness] = useState(2);
 
   let isDrawing = false;
 
@@ -35,7 +35,7 @@ function PostForm() {
     ) {
       if (!isDrawing) isDrawing = true;
       p5.stroke(color);
-      p5.strokeWeight(lineWidth);
+      p5.strokeWeight(thickness);
       p5.line(p5.pmouseX, p5.pmouseY, p5.mouseX, p5.mouseY);
 
       setDrawingLog((prev) => [
@@ -48,7 +48,7 @@ function PostForm() {
   };
 
   const createSketch = async () => {
-    const res = await fetch("http://localhost:5000/api/create_sketch", {
+    const res = await fetch("http://172.31.91.184:5000/api/create_sketch", {
       method: "POST",
     });
     const data = await res.json();
@@ -63,16 +63,18 @@ function PostForm() {
         start_y: log[i - 1].y,
         end_x: log[i].x,
         end_y: log[i].y,
+        color,
+        thickness,
       });
     }
     return lines;
   };
 
   const saveLines = async (sketch_id, lines) => {
-    await fetch("http://localhost:5000/api/save_lines", {
+    await fetch("http://172.31.91.184:5000/api/save_lines", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sketch_id, lines ,color,lineWidth}),
+      body: JSON.stringify({ sketch_id, lines}),
     });
   };
 
@@ -88,7 +90,7 @@ function PostForm() {
       image: imageData,
       log: drawingLog,
       color,
-      lineWidth,
+      thickness,
     };
 
     try {
@@ -140,8 +142,8 @@ function PostForm() {
             <button
               key={w}
               type = "button"
-              onClick = {()=> setLineWidth(w)}
-              className={"`px-2 py-1 border ${lineWidth === w ? 'bg-blue-500 text-white' : ''}`"}
+              onClick = {()=> setThickness(w)}
+              className={`px-2 py-1 border ${thickness === w ? 'bg-blue-500 text-white' : ''}`}
               >
                 {w}px
               </button>

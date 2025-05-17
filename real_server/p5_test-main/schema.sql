@@ -13,5 +13,7 @@ CREATE TABLE lines (
     start_y REAL NOT NULL,
     end_x REAL NOT NULL,
     end_y REAL NOT NULL,
+    color TEXT DEFAULT '#000000',
+    thickness REAL DEFAULT 1.0,
     FOREIGN KEY (sketch_id) REFERENCES sketches (id)
 );

@@ -1,41 +1,67 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-
-const Canvas = ({ lines }) => {
+const Canvas = ({ sketches }) => {
   const canvasRef = useRef(null);
-  const [isDrawing,setIsDrawing] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if(isDrawing || lines.length === 0) return;
-    if (!canvas) return;
+    if (!canvas || sketches.length === 0 || isDrawing) return;
+
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     setIsDrawing(true);
 
-    let index = 0;
+    let sketchIndex = 0;
+    let lineIndex = 0;
 
     const drawNext = () => {
-      if (index >= lines.length){
+      if (sketchIndex >= sketches.length) {
         setIsDrawing(false);
         return;
-      } 
+      }
 
-      const line = lines[index];
-      ctx.beginPath();
-      ctx.moveTo(line.start_x, line.start_y);
-      ctx.lineTo(line.end_x, line.end_y);
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      const currentSketch = sketches[sketchIndex];
+      const lines = currentSketch.lines;
+      const animate = currentSketch.animate;
 
-      index++;
-      setTimeout(drawNext, 30); // 30ms 間隔で次の線へ
+      // 静止画モード（一発描画）
+      if (!animate) {
+        lines.forEach(line => {
+          ctx.beginPath();
+          ctx.moveTo(line.start_x, line.start_y);
+          ctx.lineTo(line.end_x, line.end_y);
+          ctx.strokeStyle = line.color || '#000000';
+          ctx.lineWidth = line.thickness || 2;
+          ctx.stroke();
+        });
+        sketchIndex++;
+        setTimeout(drawNext, 0); // 次のスケッチへ
+        return;
+      }
+
+      // アニメーションモード
+      if (lineIndex < lines.length) {
+        const line = lines[lineIndex];
+        ctx.beginPath();
+        ctx.moveTo(line.start_x, line.start_y);
+        ctx.lineTo(line.end_x, line.end_y);
+        ctx.strokeStyle = line.color || '#000000';
+        ctx.lineWidth = line.thickness || 2;
+        ctx.stroke();
+
+        lineIndex++;
+        setTimeout(drawNext, 30);
+      } else {
+        lineIndex = 0;
+        sketchIndex++;
+        setTimeout(drawNext, 100); // 次のスケッチまで少し休む
+      }
     };
 
     drawNext();
-  }, [lines]);
+  }, [sketches]);
 
   return (
     <canvas
