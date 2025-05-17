@@ -1,18 +1,26 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+
 
 const Canvas = ({ lines }) => {
   const canvasRef = useRef(null);
+  const [isDrawing,setIsDrawing] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if(isDrawing || lines.length === 0) return;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    setIsDrawing(true);
+
     let index = 0;
 
     const drawNext = () => {
-      if (index >= lines.length) return;
+      if (index >= lines.length){
+        setIsDrawing(false);
+        return;
+      } 
 
       const line = lines[index];
       ctx.beginPath();
