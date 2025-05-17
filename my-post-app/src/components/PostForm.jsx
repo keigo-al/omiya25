@@ -7,6 +7,7 @@ function PostForm() {
   const [posts, setPosts] = useState([]);
   const [drawingLog, setDrawingLog] = useState([]);
   const [color, setColor] = useState("#000000");
+  const [lineWidth,setLineWidth] = useState(2);
 
   let isDrawing = false;
 
@@ -34,7 +35,7 @@ function PostForm() {
     ) {
       if (!isDrawing) isDrawing = true;
       p5.stroke(color);
-      p5.strokeWeight(2);
+      p5.strokeWeight(lineWidth);
       p5.line(p5.pmouseX, p5.pmouseY, p5.mouseX, p5.mouseY);
 
       setDrawingLog((prev) => [
@@ -51,7 +52,7 @@ function PostForm() {
       method: "POST",
     });
     const data = await res.json();
-    return data.Sketch_id;
+    return data.sketch_id;
   };
 
   const convertLogToLines = (log) => {
@@ -71,7 +72,7 @@ function PostForm() {
     await fetch("http://localhost:5000/api/save_lines", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sketch_id, lines }),
+      body: JSON.stringify({ sketch_id, lines ,color,lineWidth}),
     });
   };
 
@@ -87,6 +88,7 @@ function PostForm() {
       image: imageData,
       log: drawingLog,
       color,
+      lineWidth,
     };
 
     try {
@@ -133,8 +135,29 @@ function PostForm() {
           />
         </label>
 
+        <div className="flex gap-2">
+          {[1,2,4,6,8,10].map((w)=>(
+            <button
+              key={w}
+              type = "button"
+              onClick = {()=> setLineWidth(w)}
+              className={"`px-2 py-1 border ${lineWidth === w ? 'bg-blue-500 text-white' : ''}`"}
+              >
+                {w}px
+              </button>
+          ))}
+        </div>
+
         {/* キャンバス */}
-        <div className="w-[400px] h-[300px]">
+        <div className="w-[400px] h-[300px]"
+          style={{
+            backgroundColor: '#FEF3C7',
+            padding: '8px',
+            display: 'inline-block',
+            border: '4px solid #FFBB00',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          }}>
           <Sketch setup={setup} draw={draw} />
         </div>
 

@@ -1,37 +1,37 @@
-import React, {useRef, useEffect} from 'react';
+import React, { useRef, useEffect } from 'react';
 
-const Canvas = ({posts}) =>{
+const Canvas = ({ lines }) => {
   const canvasRef = useRef(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if(!canvas)return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    posts.forEach(post =>{
-      const log = post.log;
-      if(!log || log.length < 2)return;
+    lines.forEach(line => {
+      const { start_x, start_y, end_x, end_y } = line;
+      if (
+        typeof start_x !== 'number' || typeof start_y !== 'number' ||
+        typeof end_x !== 'number' || typeof end_y !== 'number'
+      ) return;
 
       ctx.beginPath();
-      ctx.moveTo(log[0].x,log[0].y);
-      for(let i = 1; i < log.length; i++){
-        ctx.lineTo(log[i].x,log[i].y);
-      }
-
-      ctx.strokeStyle = post.color || 'black';
-      ctx.lineWidth = post.width || 2;
+      ctx.moveTo(start_x, start_y);
+      ctx.lineTo(end_x, end_y);
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
       ctx.stroke();
     });
-  },[posts]);
-  
-  return(
+  }, [lines]);
+
+  return (
     <canvas
-      ref = {canvasRef}
-      width = {800}
-      height = {600}
-      style = {{border: '1px solid #ccc', marginTop:'1rem'}}
+      ref={canvasRef}
+      width={800}
+      height={600}
+      style={{ border: '1px solid #ccc', marginTop: '1rem' }}
     />
   );
 };
