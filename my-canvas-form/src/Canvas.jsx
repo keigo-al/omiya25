@@ -6,24 +6,27 @@ const Canvas = ({ lines }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    lines.forEach(line => {
-      const { start_x, start_y, end_x, end_y } = line;
-      if (
-        typeof start_x !== 'number' || typeof start_y !== 'number' ||
-        typeof end_x !== 'number' || typeof end_y !== 'number'
-      ) return;
+    let index = 0;
 
+    const drawNext = () => {
+      if (index >= lines.length) return;
+
+      const line = lines[index];
       ctx.beginPath();
-      ctx.moveTo(start_x, start_y);
-      ctx.lineTo(end_x, end_y);
+      ctx.moveTo(line.start_x, line.start_y);
+      ctx.lineTo(line.end_x, line.end_y);
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 2;
       ctx.stroke();
-    });
+
+      index++;
+      setTimeout(drawNext, 30); // 30ms 間隔で次の線へ
+    };
+
+    drawNext();
   }, [lines]);
 
   return (
