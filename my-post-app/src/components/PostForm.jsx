@@ -18,8 +18,8 @@ function PostForm() {
     }
 
     const canvas = p5.createCanvas(400, 300).parent(canvasParentRef);
-    canvas.style("width", "400px");
-    canvas.style("height", "300px");
+    canvas.style("width", "800px");
+    canvas.style("height", "600px");
 
     p5.background(255); // 白背景
     window.p5Instance = p5;
@@ -28,8 +28,8 @@ function PostForm() {
   const draw = (p5) => {
     if (
       p5.mouseIsPressed &&
-      p5.mouseY < 300 &&
-      p5.mouseX < 400 &&
+      p5.mouseY < 600 &&
+      p5.mouseX < 800 &&
       p5.mouseX >= 0 &&
       p5.mouseY >= 0
     ) {
@@ -111,68 +111,131 @@ function PostForm() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
-  return (
-  <div className="p-4 max-w-md mx-auto bg-purple-50 min-h-screen">
-    <form onSubmit={handleSubmit} className="space-y-2">
-        {/* 色選択ツール */}
-        <div className="flex gap-2 mb-2">
-          {["#000000", "#ff0000", "#0000ff", "#00cc00"].map((c) => (
-            <button
-              key={c}
-              onClick={(e) => {
-                e.preventDefault();
-                setColor(c);
-              }}
-              className="w-6 h-6 rounded-full border-2"
-              style={{ backgroundColor: c }}
-            />
-          ))}
-        </div>
-        <label className="block">
-          線の色:
-          <input
-            type="color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-          />
-        </label>
-
-        <div className="flex gap-2">
-          {[1,2,4,6,8,10].map((w)=>(
-            <button
-              key={w}
-              type = "button"
-              onClick = {()=> setThickness(w)}
-              className={`px-2 py-1 border ${thickness === w ? 'bg-blue-500 text-white' : ''}`}
-              >
-                {w}px
-              </button>
-          ))}
-        </div>
-
-        {/* キャンバス */}
-        <div className="w-[400px] h-[300px]"
+ return (
+  <div
+    style={{
+      padding: '16px',
+      maxWidth: '900px',
+      //margin: '0 auto',
+      minHeight: '100vh',
+      backgroundColor: '#F3E8FF',
+    }}
+  >
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+    >
+      {/* キャンバスとコントロールを横並び */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '24px',
+        }}
+      >
+        {/* 左：キャンバス */}
+        <div
           style={{
+            width: '800px',
+            height: '600px',
             backgroundColor: '#FEF3C7',
             padding: '8px',
-            display: 'inline-block',
             border: '4px solid #FFBB00',
             borderRadius: '8px',
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          }}>
+            touchAction: 'pan-x pinch-zoom',
+            overscrollBehaviorY: 'contain',
+          }}
+        >
           <Sketch setup={setup} draw={draw} />
         </div>
 
-        {/* 投稿ボタン */}
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          type="submit"
-        >
-          投稿
-        </button>
-      </form>
-    </div>
-  );
+        {/* 右：色と太さのコントロール */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          {/* 色選択 */}
+          <div>
+            <div
+              style={{
+                fontWeight: '500',
+                marginBottom: '8px',
+              }}
+            >
+              線の色
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {['#000000', '#ff0000', '#0000ff', '#00cc00'].map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setColor(c)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    border: color === c ? '2px solid #3B82F6' : '1px solid #ccc',
+                    backgroundColor: c,
+                  }}
+                />
+              ))}
+            </div>
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              style={{ marginTop: '8px', width: '100%' }}
+            />
+          </div>
+
+          {/* 太さ選択 */}
+          <div>
+            <div
+              style={{
+                fontWeight: '500',
+                marginBottom: '8px',
+              }}
+            >
+              線の太さ
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {[1, 2, 4, 6, 8, 10].map((w) => (
+                <button
+                  key={w}
+                  type="button"
+                  onClick={() => setThickness(w)}
+                  style={{
+                    padding: '4px 8px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    backgroundColor: thickness === w ? '#3B82F6' : 'transparent',
+                    color: thickness === w ? '#fff' : '#000',
+                  }}
+                >
+                  {w}px
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 投稿ボタン */}
+      <button
+        type="submit"
+        style={{
+          padding: '8px 16px',
+          backgroundColor: '#3B82F6',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+        }}
+      >
+        投稿
+      </button>
+    </form>
+  </div>
+);
+
 }
 
 export default PostForm;
