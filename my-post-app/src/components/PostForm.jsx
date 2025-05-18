@@ -31,7 +31,7 @@ export default function PostForm() {
 
   // 新規スケッチID取得
   const createSketch = async () => {
-    const res = await fetch("http://172.31.91.184:5000/api/create_sketch", { method: "POST" });
+    const res = await fetch("http://localhost:5000/api/create_sketch", { method: "POST" });
     if (!res.ok) throw new Error("create_sketch failed");
     return (await res.json()).sketch_id;
   };
@@ -54,7 +54,7 @@ export default function PostForm() {
 
   // 線分をサーバに保存
   const saveLines = async (sketch_id, lines) => {
-    const res = await fetch("http://172.31.91.184:5000/api/save_lines", {
+    const res = await fetch("http://localhost:5000/api/save_lines", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ sketch_id, lines }),
